@@ -1,0 +1,65 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          # Navegar para o diretório do projeto
+          cd /home/u834385447/public_html
+          
+          # Fazer backup do banco de dados
+          echo "Fazendo backup do banco de dados..."
+          mysqldump -u ${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} > backup_$(date +%Y%m%d_%H%M%S).sql
+          
+          # Atualizar o código
+          echo "Atualizando código do repositório..."
+          git pull origin main
+          
+          # Instalar/atualizar dependências
+          echo "Instalando dependências..."
+          composer install --no-dev --optimize-autoloader
+          
+          # Limpar cache
+          echo "Limpando cache..."
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan view:clear
+          php artisan route:clear
+          
+          # Executar migrations
+          echo "Executando migrations..."
+          php artisan migrate --force
+          
+          # Otimizar aplicação
+          echo "Otimizando aplicação..."
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          
+          # Definir permissões
+          echo "Definindo permissões..."
+          chmod -R 755 storage
+          chmod -R 755 bootstrap/cache
+          
+          # Reiniciar serviços se necessário
+          echo "Deploy concluído com sucesso!"
+          
+    - name: Notify deployment
+      if: success()
+      run: |
+        echo "✅ Deploy realizado com sucesso!"
+        echo "🚀 Aplicação atualizada em produção"

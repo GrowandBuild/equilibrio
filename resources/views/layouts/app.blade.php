@@ -7,6 +7,32 @@
 
         <title>{{ config('app.name', 'Equilíbrio') }} - Gestão de Hábitos</title>
 
+        <!-- PWA Meta Tags -->
+        <meta name="application-name" content="Equilíbrio">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="Equilíbrio">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="theme-color" content="#8b5cf6">
+        
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="{{ asset('manifest.json') }}">
+        
+        <!-- PWA Icons -->
+        <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192x192.png') }}">
+        <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('icons/icon-512x512.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
+        <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('icons/icon-152x152.png') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/icon-192x192.png') }}">
+        <link rel="apple-touch-icon" sizes="167x167" href="{{ asset('icons/icon-192x192.png') }}">
+        
+        <!-- iOS Splash Screens -->
+        <link rel="apple-touch-startup-image" href="{{ asset('icons/icon-512x512.png') }}">
+        
+        <!-- Microsoft Tiles -->
+        <meta name="msapplication-TileColor" content="#8b5cf6">
+        <meta name="msapplication-TileImage" content="{{ asset('icons/icon-144x144.png') }}">
+        
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -422,6 +448,120 @@
                 window.addEventListener('orientationchange', function() {
                     setTimeout(preventHorizontalScroll, 500);
                 });
+            });
+            
+            // ========================================
+            // PWA SERVICE WORKER
+            // ========================================
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(function(registration) {
+                            console.log('✅ Service Worker registrado com sucesso:', registration.scope);
+                            
+                            // Verifica atualizações a cada 1 hora
+                            setInterval(() => {
+                                registration.update();
+                            }, 3600000);
+                        })
+                        .catch(function(error) {
+                            console.log('❌ Erro ao registrar Service Worker:', error);
+                        });
+                });
+                
+                // Detecta quando uma nova versão está disponível
+                let refreshing;
+                navigator.serviceWorker.addEventListener('controllerchange', function() {
+                    if (refreshing) return;
+                    refreshing = true;
+                    window.location.reload();
+                });
+            }
+            
+            // ========================================
+            // PWA INSTALL PROMPT
+            // ========================================
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Previne o prompt automático
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                // Você pode mostrar um botão customizado aqui
+                console.log('💡 PWA pode ser instalado');
+                
+                // Opcional: Criar um banner de instalação
+                const installBanner = document.createElement('div');
+                installBanner.id = 'pwa-install-banner';
+                installBanner.innerHTML = `
+                    <div style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); 
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                color: white; padding: 15px 25px; border-radius: 50px; 
+                                box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10000;
+                                display: flex; align-items: center; gap: 15px; max-width: 90vw;">
+                        <span style="font-size: 14px; font-weight: 600;">
+                            📱 Instale o Equilíbrio no seu celular!
+                        </span>
+                        <button onclick="installPWA()" 
+                                style="background: white; color: #667eea; border: none; 
+                                       padding: 8px 20px; border-radius: 25px; font-weight: 600;
+                                       cursor: pointer; font-size: 14px;">
+                            Instalar
+                        </button>
+                        <button onclick="closePWABanner()" 
+                                style="background: transparent; color: white; border: 1px solid white; 
+                                       padding: 8px 15px; border-radius: 25px; font-weight: 600;
+                                       cursor: pointer; font-size: 14px;">
+                            Agora não
+                        </button>
+                    </div>
+                `;
+                
+                // Só mostra após 10 segundos
+                setTimeout(() => {
+                    if (!localStorage.getItem('pwa-install-dismissed')) {
+                        document.body.appendChild(installBanner);
+                    }
+                }, 10000);
+            });
+            
+            // Função para instalar PWA
+            window.installPWA = async function() {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`PWA install: ${outcome}`);
+                    deferredPrompt = null;
+                    closePWABanner();
+                }
+            };
+            
+            // Função para fechar banner
+            window.closePWABanner = function() {
+                const banner = document.getElementById('pwa-install-banner');
+                if (banner) {
+                    banner.remove();
+                    localStorage.setItem('pwa-install-dismissed', 'true');
+                }
+            };
+            
+            // Detecta quando o PWA foi instalado
+            window.addEventListener('appinstalled', () => {
+                console.log('✅ PWA instalado com sucesso!');
+                closePWABanner();
+            });
+            
+            // ========================================
+            // PWA NETWORK STATUS
+            // ========================================
+            window.addEventListener('online', () => {
+                console.log('✅ Conectado à internet');
+                // Opcional: Mostrar notificação
+            });
+            
+            window.addEventListener('offline', () => {
+                console.log('❌ Sem conexão com a internet');
+                // Opcional: Mostrar notificação
             });
         </script>
     </body>
