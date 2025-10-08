@@ -62,9 +62,18 @@ class CardHabito extends Component
         $usuario->inicializarXP(); // Garante que o XP existe
         $usuarioXp = $usuario->xp;
         
+        // Calcula diferença de XP (pode ser positiva ou negativa)
         $diferencaXp = $registro->xp_ganho - $xpAntigo;
+        
+        // Se houve mudança no XP, atualiza
         if ($diferencaXp != 0) {
-            $usuarioXp->adicionarXP($diferencaXp);
+            // Se a diferença for negativa (diminuiu), remove XP
+            if ($diferencaXp < 0) {
+                $usuarioXp->removerXP(abs($diferencaXp));
+            } else {
+                // Se a diferença for positiva (aumentou), adiciona XP
+                $usuarioXp->adicionarXP($diferencaXp);
+            }
         }
         
         $usuarioXp->atualizarSequencia();
@@ -77,13 +86,20 @@ class CardHabito extends Component
             'nivel' => $usuarioXp->fresh()->nivel_atual,
         ]);
 
-        // Mostra notificação
-        if ($registro->meta_cumprida) {
+        // Mostra notificação apenas se acabou de cumprir a meta (não estava cumprida antes)
+        $metaCumpridaAntes = $this->verificarSeMetaEstavaCumprida($xpAntigo);
+        if ($registro->meta_cumprida && !$metaCumpridaAntes) {
             $this->emit('meta-cumprida', [
                 'habito' => $this->habito->nome,
                 'emoji' => $this->habito->emoji,
             ]);
         }
+    }
+
+    private function verificarSeMetaEstavaCumprida($xpAntigo)
+    {
+        // Se tinha XP antes, significa que a meta já estava cumprida
+        return $xpAntigo > 0;
     }
 
     private function getIncremento()

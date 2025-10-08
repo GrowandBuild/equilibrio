@@ -54,7 +54,7 @@ class RegistroDiario extends Model
         $xp = 0;
 
         if ($habito->tipo === 'bom') {
-            // Hábito bom
+            // Hábito bom - quanto mais, melhor
             if ($quantidade >= $meta) {
                 $xp = 100; // Meta cumprida
                 if ($quantidade > $meta) {
@@ -66,12 +66,19 @@ class RegistroDiario extends Model
                 $this->meta_cumprida = false;
             }
         } else {
-            // Hábito ruim
-            if ($quantidade <= $meta) {
-                $xp = 100; // Dentro do limite
+            // Hábito ruim - meta é o LIMITE MÁXIMO
+            if ($quantidade == $meta) {
+                // Exatamente no limite - meta cumprida
+                $xp = 100;
+                $this->meta_cumprida = true;
+            } elseif ($quantidade < $meta) {
+                // Abaixo do limite - meta cumprida com bônus
+                $xp = 100 + (($meta - $quantidade) * 25); // Bônus por ficar abaixo
                 $this->meta_cumprida = true;
             } else {
-                $xp = -50; // Excedeu o limite
+                // Acima do limite - PUNIÇÃO!
+                $excesso = $quantidade - $meta;
+                $xp = -50 - ($excesso * 25); // -50 base + -25 por cada unidade excedida
                 $this->meta_cumprida = false;
             }
         }
@@ -88,8 +95,21 @@ class RegistroDiario extends Model
         $habito = $this->habito;
         if (!$habito || $habito->meta == 0) return 0;
 
-        $percentual = ($this->quantidade_realizada / $habito->meta) * 100;
-        return min($percentual, 100);
+        if ($habito->tipo === 'bom') {
+            // Hábito bom - quanto mais, melhor
+            $percentual = ($this->quantidade_realizada / $habito->meta) * 100;
+            return min($percentual, 100);
+        } else {
+            // Hábito ruim - meta é o limite máximo
+            if ($this->quantidade_realizada <= $habito->meta) {
+                // Dentro do limite - progresso baseado em quanto está abaixo
+                $percentual = (($habito->meta - $this->quantidade_realizada) / $habito->meta) * 100;
+                return min($percentual, 100);
+            } else {
+                // Excedeu o limite - progresso negativo
+                return 0;
+            }
+        }
     }
 
     /**
@@ -97,16 +117,30 @@ class RegistroDiario extends Model
      */
     public function getStatusAttribute()
     {
-        if ($this->meta_cumprida) {
-            return 'sucesso';
-        }
+        $habito = $this->habito;
         
-        $progresso = $this->progresso;
-        if ($progresso >= 70) {
-            return 'alerta';
+        if ($habito->tipo === 'bom') {
+            // Hábito bom
+            if ($this->meta_cumprida) {
+                return 'sucesso';
+            }
+            
+            $progresso = $this->progresso;
+            if ($progresso >= 70) {
+                return 'alerta';
+            }
+            
+            return 'erro';
+        } else {
+            // Hábito ruim
+            if ($this->quantidade_realizada > $habito->meta) {
+                return 'erro'; // Excedeu o limite
+            } elseif ($this->quantidade_realizada == $habito->meta) {
+                return 'alerta'; // No limite exato
+            } else {
+                return 'sucesso'; // Abaixo do limite (bom!)
+            }
         }
-        
-        return 'erro';
     }
 
     /**

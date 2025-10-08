@@ -313,15 +313,128 @@
         @livewireScripts
         
         <script>
-            // Animação de celebração ao cumprir meta
+            // Modal moderno para celebração de meta cumprida
+            function showMetaCumpridaModal(habito, emoji) {
+                // Criar modal
+                const modal = document.createElement('div');
+                modal.id = 'meta-cumprida-modal';
+                modal.innerHTML = `
+                    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
+                        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 opacity-0" id="modal-content">
+                            <!-- Header com gradiente -->
+                            <div class="relative bg-gradient-to-r from-green-400 to-blue-500 rounded-t-3xl p-6 text-center">
+                                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+                                        <span class="text-2xl">${emoji}</span>
+                                    </div>
+                                </div>
+                                <h3 class="text-white text-xl font-bold mt-4">Parabéns!</h3>
+                            </div>
+                            
+                            <!-- Conteúdo -->
+                            <div class="p-6 text-center">
+                                <div class="mb-4">
+                                    <div class="text-6xl mb-2">🎉</div>
+                                    <h4 class="text-2xl font-bold text-gray-800 mb-2">Meta Cumprida!</h4>
+                                    <p class="text-lg text-gray-600">${habito}</p>
+                                </div>
+                                
+                                <!-- XP ganho -->
+                                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-4 mb-4">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <span class="text-lg font-bold text-gray-800">+100 XP</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botão -->
+                                <button onclick="closeMetaModal()" 
+                                        class="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold py-3 px-6 rounded-2xl hover:from-green-600 hover:to-blue-600 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                                    Continuar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Adicionar ao body
+                document.body.appendChild(modal);
+                
+                // Animar entrada
+                setTimeout(() => {
+                    const content = document.getElementById('modal-content');
+                    content.style.transform = 'scale(1)';
+                    content.style.opacity = '1';
+                }, 10);
+                
+                // Confetes animados
+                createConfetti();
+            }
+            
+            function closeMetaModal() {
+                const modal = document.getElementById('meta-cumprida-modal');
+                if (modal) {
+                    const content = document.getElementById('modal-content');
+                    content.style.transform = 'scale(0.95)';
+                    content.style.opacity = '0';
+                    setTimeout(() => {
+                        modal.remove();
+                    }, 300);
+                }
+            }
+            
+            function createConfetti() {
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+                const confettiCount = 50;
+                
+                for (let i = 0; i < confettiCount; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.style.position = 'fixed';
+                        confetti.style.left = Math.random() * 100 + 'vw';
+                        confetti.style.top = '-10px';
+                        confetti.style.width = '10px';
+                        confetti.style.height = '10px';
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.borderRadius = '50%';
+                        confetti.style.pointerEvents = 'none';
+                        confetti.style.zIndex = '9999';
+                        confetti.style.animation = `confetti-fall ${2 + Math.random() * 3}s linear forwards`;
+                        
+                        document.body.appendChild(confetti);
+                        
+                        setTimeout(() => {
+                            confetti.remove();
+                        }, 5000);
+                    }, i * 50);
+                }
+            }
+            
+            // Adicionar CSS para animação dos confetes
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes confetti-fall {
+                    0% {
+                        transform: translateY(-100vh) rotate(0deg);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(100vh) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Event listeners
             window.addEventListener('meta-cumprida', event => {
-                // Confetes simples com alert customizado
-                alert(`🎉 Meta cumprida! ${event.detail.emoji} ${event.detail.habito}`);
+                showMetaCumpridaModal(event.detail.habito, event.detail.emoji);
             });
             
-            // Escuta eventos do Livewire
             window.livewire.on('meta-cumprida', data => {
-                alert(`🎉 Meta cumprida! ${data.emoji} ${data.habito}`);
+                showMetaCumpridaModal(data.habito, data.emoji);
             });
 
             // Função para minimizar/maximizar cards informativos

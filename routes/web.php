@@ -6,6 +6,7 @@ use App\Http\Controllers\HabitoController;
 use App\Http\Controllers\RegistroController;
 use App\Http\Controllers\InsightsController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -59,6 +60,13 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/', [PerfilController::class, 'update'])->name('update');
         Route::put('/senha', [PerfilController::class, 'atualizarSenha'])->name('senha');
         Route::delete('/foto', [PerfilController::class, 'removerFoto'])->name('remover-foto');
+    });
+    
+    // Admin
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::post('/upload-logo', [AdminController::class, 'uploadLogo'])->name('upload-logo');
+        Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
     });
     
     // Rotas antigas do Breeze (manter compatibilidade)

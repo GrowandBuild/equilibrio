@@ -75,6 +75,16 @@ class UsuarioXp extends Model
     }
 
     /**
+     * Remove XP (não pode ficar negativo)
+     */
+    public function removerXP($xp)
+    {
+        $this->xp_total = max(0, $this->xp_total - $xp);
+        $this->calcularNivel();
+        $this->save();
+    }
+
+    /**
      * Atualiza sequência
      */
     public function atualizarSequencia()
