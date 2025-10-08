@@ -95,7 +95,7 @@ class Habito extends Model
      */
     public function getMetaFormatadaAttribute()
     {
-        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos'];
+        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos', 'minutos', 'horas', 'calorias', 'gramas'];
         
         if (in_array($this->unidade, $unidadesInteiras)) {
             return number_format($this->meta, 0, ',', '.');
@@ -109,7 +109,7 @@ class Habito extends Model
      */
     public function getStepAttribute()
     {
-        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos'];
+        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos', 'minutos', 'horas', 'calorias', 'gramas'];
         
         if (in_array($this->unidade, $unidadesInteiras)) {
             return '1';
@@ -123,7 +123,7 @@ class Habito extends Model
      */
     public function getValorInputAttribute()
     {
-        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos'];
+        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos', 'minutos', 'horas', 'calorias', 'gramas'];
         
         if (in_array($this->unidade, $unidadesInteiras)) {
             return number_format($this->meta, 0, '.', '');

@@ -148,7 +148,7 @@ class RegistroDiario extends Model
      */
     public function getQuantidadeFormatadaAttribute()
     {
-        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos'];
+        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos', 'minutos', 'horas', 'calorias', 'gramas'];
         
         if (in_array($this->habito->unidade, $unidadesInteiras)) {
             return number_format($this->quantidade_realizada, 0, ',', '.');
@@ -162,7 +162,7 @@ class RegistroDiario extends Model
      */
     public function getQuantidadeInputAttribute()
     {
-        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos'];
+        $unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos', 'minutos', 'horas', 'calorias', 'gramas'];
         
         if (in_array($this->habito->unidade, $unidadesInteiras)) {
             return number_format($this->quantidade_realizada, 0, '.', '');

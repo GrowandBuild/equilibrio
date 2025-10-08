@@ -60,7 +60,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">XP Ganho Hoje</p>
-                            <p class="text-3xl font-bold text-gray-900">+{{ $xpGanhoHoje }}</p>
+                            <p class="text-3xl font-bold {{ $xpGanhoHoje >= 0 ? 'text-gray-900' : 'text-red-600' }}">{{ $xpGanhoHoje >= 0 ? '+' : '' }}{{ $xpGanhoHoje }}</p>
                         </div>
                         <div class="p-3 bg-purple-100 rounded-full">
                             <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,10 +76,10 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900">Progresso do Nível</h3>
-                        <p class="text-sm text-gray-600">Nível {{ $usuarioXp->nivel_atual ?? 1 }} - {{ $usuarioXp->xp_total ?? 0 }} XP</p>
+                        <p class="text-sm text-gray-600">Nível {{ $usuarioXp->nivel_atual ?? 'Iniciante' }} - {{ $usuarioXp->xp_total ?? 0 }} XP</p>
                     </div>
                     <div class="text-right">
-                        <div class="text-2xl font-bold text-purple-600">{{ $usuarioXp->xp_total ?? 0 }}</div>
+                        <div class="text-2xl font-bold {{ ($usuarioXp->xp_total ?? 0) < 0 ? 'text-red-600' : 'text-purple-600' }}">{{ $usuarioXp->xp_total ?? 0 }}</div>
                         <div class="text-sm text-gray-500">XP Total</div>
                     </div>
                 </div>
@@ -98,8 +98,15 @@
                         $xpMin = $nivelAtual['xp_min'] ?? 0;
                         $xpMax = $nivelAtual['xp_max'] ?? 1000;
                     @endphp
-                    <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all duration-300" 
-                         style="width: {{ $progresso }}%"></div>
+                    @if(($usuarioXp->xp_total ?? 0) < 0)
+                        {{-- XP Negativo: Barra vermelha --}}
+                        <div class="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full transition-all duration-300" 
+                             style="width: 100%"></div>
+                    @else
+                        {{-- XP Positivo: Barra normal --}}
+                        <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all duration-300" 
+                             style="width: {{ $progresso }}%"></div>
+                    @endif
                 </div>
                 
                 <div class="flex justify-between text-xs text-gray-500">

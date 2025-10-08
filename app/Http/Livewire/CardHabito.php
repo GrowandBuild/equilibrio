@@ -107,14 +107,15 @@ class CardHabito extends Component
         $incrementos = [
             'litros' => 0.5,
             'ml' => 100,
-            'minutos' => 15,
-            'horas' => 0.5,
-            'km' => 1,
-            'metros' => 100,
-            'páginas' => 10,
-            'calorias' => 100,
-            'gramas' => 50,
-            'kg' => 0.5,
+            'minutos' => 5,   // Incremento de 5 em 5 minutos
+            'horas' => 1,     // Incremento de 1 em 1 hora
+            'km' => 1,        // Incremento de 1 em 1 km
+            'metros' => 100,  // Incremento de 100 em 100 metros
+            'páginas' => 10,  // Incremento de 10 em 10 páginas
+            'calorias' => 50, // Incremento de 50 em 50 calorias
+            'gramas' => 50,   // Incremento de 50 em 50 gramas
+            'kg' => 0.5,      // Incremento de 0.5 em 0.5 kg
+            'passos' => 1000, // Incremento de 1000 em 1000 passos
         ];
 
         return $incrementos[$this->habito->unidade] ?? 1;

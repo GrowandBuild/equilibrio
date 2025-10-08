@@ -1,24 +1,19 @@
 <nav x-data="{ open: false }" class="bg-white shadow-sm border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+        <!-- Desktop Header -->
+        <div class="hidden md:flex justify-between h-16">
             <!-- Logo e Nome -->
             <div class="flex items-center">
                 <a href="{{ route('dashboard') }}" class="flex items-center space-x-3">
                     @if(Storage::disk('public')->exists('logo.png'))
                         <img src="{{ Storage::url('logo.png') }}" 
                              alt="Equilíbrio" 
-                             class="w-10 h-10 rounded-xl object-cover shadow-lg">
+                             class="w-14 h-14 object-contain">
                     @else
-                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-                            <span class="text-2xl">⚖️</span>
+                        <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                            <span class="text-4xl">⚖️</span>
                         </div>
                     @endif
-                    <div class="hidden sm:block">
-                        <h1 class="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                            Equilíbrio
-                        </h1>
-                        <p class="text-xs text-gray-500">Gestão de Hábitos</p>
-                    </div>
                     </a>
                 </div>
 
@@ -71,13 +66,7 @@
             </div>
 
             <!-- User Menu -->
-            <div class="flex items-center space-x-4">
-                <!-- Notifications (placeholder) -->
-                <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12 7H4.828z"/>
-                                </svg>
-                </button>
+            <div class="flex items-center">
 
                 <!-- User Dropdown -->
                 <div class="relative" x-data="{ open: false }">
@@ -142,9 +131,28 @@
                         </form>
                     </div>
             </div>
+            </div>
+        </div>
 
-                <!-- Mobile Menu Button -->
-                <button @click="open = !open" class="md:hidden p-2 text-gray-400 hover:text-gray-600">
+        <!-- Mobile Header -->
+        <div class="md:hidden flex items-center h-16 pl-4">
+            <!-- Avatar à Esquerda -->
+            <div class="flex items-center">
+                <img src="{{ Auth::user()->foto_url }}" 
+                     alt="{{ Auth::user()->name }}"
+                     class="w-8 h-8 rounded-full object-cover">
+            </div>
+
+            <!-- Logo "EQUILIBRIO" no Meio -->
+            <div class="flex items-center flex-1 justify-center">
+                <a href="{{ route('dashboard') }}" class="text-xl font-bold text-gray-900">
+                    EQUILIBRIO
+                </a>
+            </div>
+
+            <!-- Hamburger Menu à Direita -->
+            <div class="flex items-center -mr-4"> <!-- compensa o px-4 do container pai -->
+                <button @click="open = !open" class="text-gray-400 hover:text-gray-600 pl-3 pr-0 py-3">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path x-show="!open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         <path x-show="open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -165,7 +173,7 @@
          class="md:hidden border-t border-gray-200 bg-white">
         
         <!-- XP Indicator Mobile -->
-        <div class="px-4 py-3 border-b border-gray-200">
+        <div class="px-4 py-4 border-b border-gray-200">
             @livewire('xp-indicator')
         </div>
         

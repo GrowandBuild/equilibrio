@@ -475,7 +475,7 @@
             
             function updateStep() {
                 const unidade = unidadeSelect.value;
-                const unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos'];
+                const unidadesInteiras = ['vezes', 'unidades', 'porções', 'páginas', 'repetições', 'passos', 'copos', 'minutos', 'horas', 'calorias', 'gramas'];
                 
                 if (unidadesInteiras.includes(unidade)) {
                     metaInput.step = '1';
