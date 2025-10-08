@@ -127,8 +127,8 @@ class User extends Authenticatable
      */
     public function getFotoUrlAttribute()
     {
-        if ($this->foto_perfil) {
-            return asset('storage/' . $this->foto_perfil);
+        if ($this->foto) {
+            return asset('storage/' . $this->foto);
         }
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7c3aed&background=f3f4f6';
     }

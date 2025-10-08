@@ -44,6 +44,9 @@
         
         <!-- CSS para PWA e Mobile Responsivo -->
         <style>
+            /* Alpine.js x-cloak */
+            [x-cloak] { display: none !important; }
+            
             /* Reset para PWA e prevenção de scroll lateral */
             * {
                 -webkit-tap-highlight-color: transparent;
