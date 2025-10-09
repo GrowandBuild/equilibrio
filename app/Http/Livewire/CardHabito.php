@@ -16,11 +16,31 @@ class CardHabito extends Component
     public function mount($habito, $registro = null)
     {
         $this->habito = $habito;
+        $this->carregarRegistroHoje();
+    }
+
+    /**
+     * Hydrate é executado toda vez que o componente é rehidratado
+     * Garante que sempre carregue os dados atualizados
+     */
+    public function hydrate()
+    {
+        $this->carregarRegistroHoje();
+    }
+
+    /**
+     * Carrega o registro de hoje do banco de dados
+     */
+    private function carregarRegistroHoje()
+    {
+        // Busca registro de hoje no banco
+        $registroHoje = RegistroDiario::where('habito_id', $this->habito->id)
+            ->whereDate('data', today())
+            ->first();
         
-        // Verifica se o registro é de hoje, caso contrário, ignora
-        if ($registro && $registro->data->isToday()) {
-            $this->registro = $registro;
-            $this->quantidade = $registro->quantidade_input;
+        if ($registroHoje) {
+            $this->registro = $registroHoje;
+            $this->quantidade = $registroHoje->quantidade_input;
         } else {
             $this->registro = null;
             $this->quantidade = 0;
