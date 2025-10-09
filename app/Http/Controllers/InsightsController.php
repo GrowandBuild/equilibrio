@@ -17,12 +17,19 @@ class InsightsController extends Controller
     {
         $usuario = auth()->user();
         $periodo = $request->input('periodo', '7'); // 7, 30, 90 dias
+        $habitoId = $request->input('habito'); // ID do hábito específico para visualizar
         
         $dataInicio = today()->subDays($periodo - 1);
         $dataFim = today();
         
+        // Se um hábito específico foi solicitado, filtra apenas ele
+        $queryBase = RegistroDiario::where('usuario_id', $usuario->id);
+        if ($habitoId) {
+            $queryBase = $queryBase->where('habito_id', $habitoId);
+        }
+        
         // XP ao longo do período
-        $xpPorDia = RegistroDiario::where('usuario_id', $usuario->id)
+        $xpPorDia = $queryBase->clone()
             ->whereBetween('data', [$dataInicio, $dataFim])
             ->selectRaw('DATE(data) as dia, SUM(xp_ganho) as total_xp')
             ->groupBy('dia')
@@ -83,6 +90,14 @@ class InsightsController extends Controller
         // Frases motivacionais
         $frase = $this->getFraseMotivacional($melhoria, $taxaCumprimento, $usuario->xp->sequencia_dias_atual);
         
+        // Hábito específico se solicitado
+        $habitoEspecifico = null;
+        if ($habitoId) {
+            $habitoEspecifico = Habito::where('usuario_id', $usuario->id)
+                ->where('id', $habitoId)
+                ->first();
+        }
+        
         return view('insights.index', compact(
             'xpPorDia',
             'melhoresHabitos',
@@ -90,6 +105,7 @@ class InsightsController extends Controller
             'taxaCumprimento',
             'xpPeriodoAtual',
             'melhoria',
+            'habitoEspecifico',
             'frase',
             'periodo'
         ));

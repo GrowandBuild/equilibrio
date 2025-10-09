@@ -64,6 +64,10 @@
                                             ✏️ Editar
                                         </a>
                                         @if($habito->temRegistros())
+                                            <a href="{{ route('insights.index') }}?habito={{ $habito->id }}" 
+                                               class="text-sm text-green-600 hover:text-green-700 font-medium">
+                                                📊 Histórico
+                                            </a>
                                             <span class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
                                                 ⚠️ Tem registros
                                             </span>

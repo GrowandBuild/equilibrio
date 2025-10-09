@@ -11,7 +11,7 @@ class CardHabito extends Component
     public $registro;
     public $quantidade = 0;
 
-    protected $listeners = ['registroAtualizado'];
+    protected $listeners = ['registroAtualizado', 'refreshDay' => 'forcarAtualizacao'];
 
     public function mount($habito, $registro = null)
     {
@@ -45,6 +45,22 @@ class CardHabito extends Component
             $this->registro = null;
             $this->quantidade = 0;
         }
+    }
+
+    /**
+     * Força atualização dos dados quando o botão "Atualizar Dia" é clicado
+     */
+    public function forcarAtualizacao()
+    {
+        // Limpa qualquer cache local
+        $this->registro = null;
+        $this->quantidade = 0;
+        
+        // Recarrega os dados do banco
+        $this->carregarRegistroHoje();
+        
+        // Força re-render do componente
+        $this->render();
     }
 
     public function incrementar()
