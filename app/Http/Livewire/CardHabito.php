@@ -16,8 +16,15 @@ class CardHabito extends Component
     public function mount($habito, $registro = null)
     {
         $this->habito = $habito;
-        $this->registro = $registro;
-        $this->quantidade = $registro ? $registro->quantidade_input : 0;
+        
+        // Verifica se o registro é de hoje, caso contrário, ignora
+        if ($registro && $registro->data->isToday()) {
+            $this->registro = $registro;
+            $this->quantidade = $registro->quantidade_input;
+        } else {
+            $this->registro = null;
+            $this->quantidade = 0;
+        }
     }
 
     public function incrementar()

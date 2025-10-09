@@ -20,8 +20,12 @@ class DashboardController extends Controller
         // Dados do usuário
         $usuarioXp = $usuario->xp;
         
-        // Hábitos ativos
-        $habitos = $usuario->habitosAtivos;
+        // Hábitos ativos com registro de hoje
+        $habitos = $usuario->habitosAtivos()
+            ->with(['registroHoje' => function($query) {
+                $query->whereDate('data', today());
+            }])
+            ->get();
         
         // Registros de hoje
         $registrosHoje = $usuario->registrosHoje;

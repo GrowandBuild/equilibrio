@@ -246,7 +246,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($habitos as $habito)
                             @php
-                                $registroHoje = $habito->registros->where('data', today())->first();
+                                $registroHoje = $habito->registroHoje;
                             @endphp
                             
                             @livewire('card-habito', [
